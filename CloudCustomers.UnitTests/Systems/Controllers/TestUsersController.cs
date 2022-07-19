@@ -1,4 +1,4 @@
-namespace CloudCustomers.UnitTests;
+namespace CloudCustomers.UnitTests.Systems.Controllers;
 
 public class UnitTest1
 {
