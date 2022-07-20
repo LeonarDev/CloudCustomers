@@ -17,6 +17,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Get()
     {
         var users = await _usersService.GetAllUsers();
-        return Ok("Ok");
+
+        return users.Any() ? Ok("Ok") : NotFound("Not Found");
     }
 }

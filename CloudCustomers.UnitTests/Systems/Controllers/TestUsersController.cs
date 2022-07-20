@@ -14,7 +14,21 @@ public class TestUsersController
         var mockUsersService = new Mock<IUsersService>();
         mockUsersService
             .Setup(service => service.GetAllUsers())
-            .ReturnsAsync(new List<User>());
+            .ReturnsAsync(new List<User>()
+            {
+                new User()
+                {
+                    Id = 1,
+                    Name = "Name",
+                    Email = "email@email.com",
+                    Address = new Address()
+                    {
+                        Street = "Street",
+                        City = "City",
+                        ZipCode = "12345"
+                    }
+                }
+            });
 
         var sut = new UsersController(mockUsersService.Object);
 
@@ -27,6 +41,7 @@ public class TestUsersController
     public async Task Get_OnSuccess_InvokesUserServiceExactlyOnce()
     {
         var mockUsersService = new Mock<IUsersService>();
+
         mockUsersService
             .Setup(service => service.GetAllUsers())
             .ReturnsAsync(new List<User>());
@@ -35,6 +50,60 @@ public class TestUsersController
 
         var result = await sut.Get();
 
-        mockUsersService.Verify(service => service.GetAllUsers(), Times.Once());
+        mockUsersService.Verify(
+            service => service.GetAllUsers(), Times.Once());
     }
+
+    [Fact]
+    public async Task Get_OnSuccess_ReturnsListOfUsers()
+    {
+        var mockUsersService = new Mock<IUsersService>();
+
+        mockUsersService
+            .Setup(service => service.GetAllUsers())
+            .ReturnsAsync(new List<User>()
+            {
+                new User()
+                {
+                    Id = 1,
+                    Name = "Name",
+                    Email = "email@email.com",
+                    Address = new Address()
+                    {
+                        Street = "Street",
+                        City = "City",
+                        ZipCode = "12345"
+                    }
+                }
+            });
+
+        var sut = new UsersController(mockUsersService.Object);
+
+        var result = await sut.Get();
+
+        result.Should().BeOfType<OkObjectResult>();
+        var objectResult = (OkObjectResult)result;
+        objectResult.Value.Should().BeOfType<List<User>>();
+    }
+
+    [Fact]
+    public async Task Get_OnNoUsersFound_ReturnsStatusCode404()
+    {
+        var mockUsersService = new Mock<IUsersService>();
+
+        mockUsersService
+            .Setup(service => service.GetAllUsers())
+            .ReturnsAsync(new List<User>());
+
+        var sut = new UsersController(mockUsersService.Object);
+
+        var result = await sut.Get();
+
+        result.Should().BeOfType<NotFoundResult>();
+        var objectResult = (NotFoundResult)result;
+        objectResult.StatusCode.Should().Be(404);
+
+    }
+
+
 }
